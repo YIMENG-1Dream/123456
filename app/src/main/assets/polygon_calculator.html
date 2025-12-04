@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>多边形计算机</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary-color: #4b6cb7;
+            --secondary-color: #182848;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #2ecc71;
+            --info-color: #3498db;
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #2a2a3c;
+            --text-primary: #e6e6e6;
+            --text-secondary: #aaa;
+            --border-color: #444;
+            --grid-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        body[data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #ddd;
+            --grid-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        body[data-theme="red"] {
+            --bg-primary: #2c0909;
+            --bg-secondary: #3a1212;
+            --primary-color: #c62828;
+            --secondary-color: #8e0000;
+        }
+        
+        body[data-theme="green"] {
+            --bg-primary: #0d2a16;
+            --bg-secondary: #16381f;
+            --primary-color: #2e7d32;
+            --secondary-color: #1b5e20;
+        }
+        
+        body[data-theme="blue"] {
+            --bg-primary: #0d1b2a;
+            --bg-secondary: #1b2b42;
+            --primary-color: #1565c0;
+            --secondary-color: #0d47a1;
+        }
+        
+        body[data-theme="yellow"] {
+            --bg-primary: #332600;
+            --bg-secondary: #4d3d00;
+            --primary-color: #f9a825;
+            --secondary-color: #f57f17;
+        }
+        
+        body[data-theme="cyan"] {
+            --bg-primary: #00332d;
+            --bg-secondary: #004d46;
+            --primary-color: #00838f;
+            --secondary-color: #006064;
+        }
+        
+        body[data-theme="purple"] {
+            --bg-primary: #2d0033;
+            --bg-secondary: #46004d;
+            --primary-color: #8e24aa;
+            --secondary-color: #6a1b9a;
+        }
+        
+        body[data-theme="brown"] {
+            --bg-primary: #26170d;
+            --bg-secondary: #3d2414;
+            --primary-color: #6d4c41;
+            --secondary-color: #4e342e;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 15px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: rgba(var(--bg-secondary-rgb), 0.95);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        body[data-theme="light"] .container {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        header {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+        
+        .input-section {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .chart-section {
+            padding: 15px;
+            min-height: 400px;
+            position: relative;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(117, 139, 253, 0.4);
+            outline: none;
+        }
+        
+        button {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        button:active {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subject-list {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            background-color: var(--bg-secondary);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .subject-item {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .subject-item:last-child {
+            border-bottom: none;
+        }
+        
+        .subject-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .subject-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+        
+        .subject-scores {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .score-this {
+            color: var(--primary-color);
+        }
+        
+        .score-last {
+            color: var(--info-color);
+        }
+        
+        .subject-suggestion {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            font-style: italic;
+            padding: 5px 8px;
+            background: rgba(var(--primary-color-rgb), 0.1);
+            border-radius: 4px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .improvement-good {
+            color: var(--success-color);
+            border-left-color: var(--success-color);
+        }
+        
+        .improvement-warning {
+            color: var(--warning-color);
+            border-left-color: var(--warning-color);
+        }
+        
+        .improvement-danger {
+            color: var(--danger-color);
+            border-left-color: var(--danger-color);
+        }
+        
+        .subject-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .edit-btn {
+            background: var(--info-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            flex: 1;
+        }
+        
+        .edit-btn:active {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+        
+        .delete-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            flex: 1;
+        }
+        
+        .delete-btn:active {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chart-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .refresh-btn {
+            background: var(--info-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            width: auto;
+            margin-top: 0;
+        }
+        
+        .refresh-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .chart-options {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chart-options label {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px 15px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+        }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: auto;
+            padding: 0;
+        }
+        
+        .close-btn:active {
+            color: var(--danger-color);
+            transform: scale(0.9);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-actions button {
+            flex: 1;
+            margin-top: 0;
+        }
+        
+        .cancel-btn {
+            background: var(--text-secondary);
+        }
+        
+        .cancel-btn:active {
+            background: #7f8c8d;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .file-actions button {
+            flex: 1;
+            margin-top: 0;
+        }
+        
+        .export-btn {
+            background: var(--success-color);
+        }
+        
+        .export-btn:active {
+            background: #27ae60;
+        }
+        
+        .import-btn {
+            background: var(--warning-color);
+        }
+        
+        .import-btn:active {
+            background: #e67e22;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .theme-selector {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .theme-btn:active {
+            transform: scale(1.1);
+            border-color: white;
+        }
+        
+        .theme-btn.active {
+            border-color: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .theme-dark { background: #1a1a2e; }
+        .theme-light { background: #ffffff; }
+        .theme-red { background: #c62828; }
+        .theme-green { background: #2e7d32; }
+        .theme-blue { background: #1565c0; }
+        .theme-yellow { background: #f9a825; }
+        .theme-cyan { background: #00838f; }
+        .theme-purple { background: #8e24aa; }
+        .theme-brown { background: #6d4c41; }
+        
+        /* 移动端优化 */
+        @media (max-width: 767px) {
+            body {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .subject-scores {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .chart-container {
+                height: 350px;
+            }
+            
+            .subject-actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .edit-btn, .delete-btn {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* 平板和桌面适配 */
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+            
+            .input-section {
+                flex: 1;
+                border-right: 1px solid var(--border-color);
+                border-bottom: none;
+            }
+            
+            .chart-section {
+                flex: 1.5;
+            }
+            
+            .subject-list {
+                max-height: 350px;
+            }
+            
+            .chart-container {
+                height: 450px;
+            }
+        }
+        
+        /* 防止双击缩放 */
+        .no-double-tap-zoom {
+            touch-action: manipulation;
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+    </style>
+</head>
+<body data-theme="dark" class="no-double-tap-zoom">
+    <div class="container">
+        <header>
+            <h1>多边形计算机</h1>
+            <p class="subtitle">成绩分析与可视化工具</p>
+            <div class="theme-selector">
+                <div class="theme-btn theme-dark active" data-theme="dark" title="黑色主题"></div>
+                <div class="theme-btn theme-light" data-theme="light" title="白色主题"></div>
+                <div class="theme-btn theme-red" data-theme="red" title="红色主题"></div>
+                <div class="theme-btn theme-green" data-theme="green" title="绿色主题"></div>
+                <div class="theme-btn theme-blue" data-theme="blue" title="蓝色主题"></div>
+                <div class="theme-btn theme-yellow" data-theme="yellow" title="黄色主题"></div>
+                <div class="theme-btn theme-cyan" data-theme="cyan" title="青色主题"></div>
+                <div class="theme-btn theme-purple" data-theme="purple" title="紫色主题"></div>
+                <div class="theme-btn theme-brown" data-theme="brown" title="棕色主题"></div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="subject">科目名称</label>
+                    <input type="text" id="subject" placeholder="例如: 数学">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fullScore">满分</label>
+                    <input type="number" id="fullScore" placeholder="例如: 100" min="1" value="100" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="currentScore">当前分数</label>
+                    <input type="number" id="currentScore" placeholder="例如: 85" min="0" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="scoreTime">成绩时间</label>
+                    <select id="scoreTime">
+                        <option value="this">这次成绩</option>
+                        <option value="last">上次成绩</option>
+                    </select>
+                </div>
+                
+                <button id="addSubject">添加/更新科目</button>
+                
+                <div class="file-actions">
+                    <button class="export-btn" id="exportBtn">导出JSON</button>
+                    <button class="import-btn" id="importBtn">导入JSON</button>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input" accept=".json">
+                
+                <div class="toggle-container">
+                    <span class="toggle-label">显示平均成绩</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showAverage" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="subject-list" id="subjectList">
+                    <div class="no-data">暂无科目数据</div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalSubjects">0</div>
+                        <div class="stat-label">总科目数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="averageScore">0</div>
+                        <div class="stat-label">平均分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalScore">0</div>
+                        <div class="stat-label">总分</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-section">
+                <div class="chart-controls">
+                    <div>成绩雷达图</div>
+                    <button class="refresh-btn" id="refreshChart">刷新图表</button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                
+                <div class="chart-options">
+                    <label>
+                        <input type="checkbox" id="showAverageChart" checked>
+                        <span>显示平均成绩</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showComparison" disabled>
+                        <span>成绩对比</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>多边形计算机 &copy; 2023 - 移动版</p>
+        </footer>
+    </div>
+
+    <!-- 编辑科目模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">编辑科目</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="editSubject">科目名称</label>
+                <input type="text" id="editSubject">
+            </div>
+            <div class="form-group">
+                <label for="editFullScore">满分</label>
+                <input type="number" id="editFullScore" min="1" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="editCurrentScore">当前分数</label>
+                <input type="number" id="editCurrentScore" min="0" step="0.01">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" id="cancelEdit">取消</button>
+                <button id="saveEdit">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PolygonCalculator {
+            constructor() {
+                this.subjectsThis = [];
+                this.subjectsLast = [];
+                this.currentTheme = 'dark';
+                this.chart = null;
+                this.editingSubjectId = null;
+                this.editingTime = 'this';
+                this.deviceType = 'mobile'; // 固定为手机端
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.loadFromStorage();
+                this.updateUI();
+                this.preventDoubleTapZoom();
+            }
+            
+            initializeElements() {
+                this.elements = {
+                    subjectInput: document.getElementById('subject'),
+                    fullScoreInput: document.getElementById('fullScore'),
+                    currentScoreInput: document.getElementById('currentScore'),
+                    scoreTime: document.getElementById('scoreTime'),
+                    addButton: document.getElementById('addSubject'),
+                    subjectList: document.getElementById('subjectList'),
+                    totalSubjects: document.getElementById('totalSubjects'),
+                    averageScore: document.getElementById('averageScore'),
+                    totalScore: document.getElementById('totalScore'),
+                    showAverage: document.getElementById('showAverage'),
+                    showAverageChart: document.getElementById('showAverageChart'),
+                    showComparison: document.getElementById('showComparison'),
+                    refreshChart: document.getElementById('refreshChart'),
+                    body: document.body,
+                    canvas: document.getElementById('radarChart'),
+                    editModal: document.getElementById('editModal'),
+                    editSubject: document.getElementById('editSubject'),
+                    editFullScore: document.getElementById('editFullScore'),
+                    editCurrentScore: document.getElementById('editCurrentScore'),
+                    saveEdit: document.getElementById('saveEdit'),
+                    closeModal: document.getElementById('closeModal'),
+                    cancelEdit: document.getElementById('cancelEdit'),
+                    exportBtn: document.getElementById('exportBtn'),
+                    importBtn: document.getElementById('importBtn'),
+                    fileInput: document.getElementById('fileInput')
+                };
+                
+                this.ctx = this.elements.canvas.getContext('2d');
+            }
+            
+            preventDoubleTapZoom() {
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', (event) => {
+                    const now = Date.now();
+                    if (now - lastTouchEnd <= 300) {
+                        event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, { passive: false });
+            }
+            
+            bindEvents() {
+                this.elements.addButton.addEventListener('click', () => this.addSubject());
+                this.elements.showAverage.addEventListener('change', () => {
+                    this.elements.showAverageChart.checked = this.elements.showAverage.checked;
+                    this.updateChart();
+                });
+                this.elements.showAverageChart.addEventListener('change', () => {
+                    this.elements.showAverage.checked = this.elements.showAverageChart.checked;
+                    this.updateChart();
+                });
+                this.elements.showComparison.addEventListener('change', () => this.updateChart());
+                this.elements.refreshChart.addEventListener('click', () => this.updateChart());
+                this.elements.saveEdit.addEventListener('click', () => this.saveEdit());
+                this.elements.closeModal.addEventListener('click', () => this.closeModal());
+                this.elements.cancelEdit.addEventListener('click', () => this.closeModal());
+                this.elements.exportBtn.addEventListener('click', () => this.exportData());
+                this.elements.importBtn.addEventListener('click', () => this.importFile());
+                this.elements.fileInput.addEventListener('change', (e) => this.importData(e));
+                
+                // 主题切换按钮
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const theme = e.target.dataset.theme;
+                        this.changeTheme(theme);
+                    });
+                });
+                
+                // 回车键快速添加
+                this.elements.currentScoreInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addSubject();
+                });
+                
+                // 点击模态框外部关闭
+                this.elements.editModal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.editModal) {
+                        this.closeModal();
+                    }
+                });
+                
+                // 移动端优化：输入框聚焦时滚动到可见位置
+                const inputs = document.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', () => {
+                        setTimeout(() => {
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                    });
+                });
+            }
+            
+            importFile() {
+                if (typeof Android !== 'undefined') {
+                    // 在Android应用中，触发文件选择器
+                    this.showMessage('请在文件选择器中选择JSON文件');
+                    // 这里可以通过Android接口调用原生文件选择器
+                    // 暂时使用隐藏的input
+                    this.elements.fileInput.click();
+                } else {
+                    this.elements.fileInput.click();
+                }
+            }
+            
+            addSubject() {
+                const subjectName = this.elements.subjectInput.value.trim();
+                const fullScore = parseFloat(this.elements.fullScoreInput.value);
+                const currentScore = parseFloat(this.elements.currentScoreInput.value);
+                const timeType = this.elements.scoreTime.value;
+                
+                if (!this.validateInput(subjectName, fullScore, currentScore)) {
+                    return;
+                }
+                
+                const percentage = this.calculatePercentage(currentScore, fullScore);
+                const subjectData = {
+                    id: Date.now(),
+                    subject: subjectName,
+                    fullScore,
+                    currentScore,
+                    percentage
+                };
+                
+                if (timeType === 'this') {
+                    const existingIndex = this.subjectsThis.findIndex(s => s.subject === subjectName);
+                    if (existingIndex !== -1) {
+                        this.subjectsThis[existingIndex] = subjectData;
+                        this.showMessage(`${subjectName} 的这次成绩已更新`);
+                    } else {
+                        this.subjectsThis.push(subjectData);
+                        this.showMessage(`${subjectName} 已添加到这次成绩`);
+                    }
+                } else {
+                    const existingIndex = this.subjectsLast.findIndex(s => s.subject === subjectName);
+                    if (existingIndex !== -1) {
+                        this.subjectsLast[existingIndex] = subjectData;
+                        this.showMessage(`${subjectName} 的上次成绩已更新`);
+                    } else {
+                        this.subjectsLast.push(subjectData);
+                        this.showMessage(`${subjectName} 已添加上次成绩`);
+                    }
+                }
+                
+                this.clearInputs();
+                this.updateComparisonStatus();
+                this.saveToStorage();
+                this.updateUI();
+            }
+            
+            validateInput(subject, fullScore, currentScore) {
+                if (!subject) {
+                    this.showMessage('请输入科目名称');
+                    return false;
+                }
+                
+                if (isNaN(fullScore) || fullScore <= 0) {
+                    this.showMessage('请输入有效的满分');
+                    return false;
+                }
+                
+                if (isNaN(currentScore) || currentScore < 0) {
+                    this.showMessage('请输入有效的当前分数');
+                    return false;
+                }
+                
+                if (currentScore > fullScore) {
+                    this.showMessage('当前分数不能超过满分');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            calculatePercentage(current, full) {
+                return parseFloat(((current / full) * 100).toFixed(2));
+            }
+            
+            showMessage(message) {
+                if (typeof Android !== 'undefined') {
+                    Android.showToast(message);
+                } else {
+                    alert(message);
+                }
+            }
+            
+            clearInputs() {
+                this.elements.subjectInput.value = '';
+                this.elements.currentScoreInput.value = '';
+                this.elements.subjectInput.focus();
+            }
+            
+            deleteSubject(id, timeType) {
+                if (confirm('确定要删除这个成绩吗？')) {
+                    if (timeType === 'this') {
+                        this.subjectsThis = this.subjectsThis.filter(subject => subject.id !== id);
+                    } else {
+                        this.subjectsLast = this.subjectsLast.filter(subject => subject.id !== id);
+                    }
+                    this.updateComparisonStatus();
+                    this.saveToStorage();
+                    this.updateUI();
+                    this.showMessage('成绩已删除');
+                }
+            }
+            
+            editSubject(id, timeType) {
+                const subjects = timeType === 'this' ? this.subjectsThis : this.subjectsLast;
+                const subject = subjects.find(s => s.id === id);
+                if (!subject) return;
+                
+                this.editingSubjectId = id;
+                this.editingTime = timeType;
+                this.elements.editSubject.value = subject.subject;
+                this.elements.editFullScore.value = subject.fullScore;
+                this.elements.editCurrentScore.value = subject.currentScore;
+                this.elements.editModal.style.display = 'flex';
+            }
+            
+            saveEdit() {
+                const subjectName = this.elements.editSubject.value.trim();
+                const fullScore = parseFloat(this.elements.editFullScore.value);
+                const currentScore = parseFloat(this.elements.editCurrentScore.value);
+                
+                if (!this.validateInput(subjectName, fullScore, currentScore)) {
+                    return;
+                }
+                
+                const subjects = this.editingTime === 'this' ? this.subjectsThis : this.subjectsLast;
+                const subjectIndex = subjects.findIndex(s => s.id === this.editingSubjectId);
+                if (subjectIndex !== -1) {
+                    subjects[subjectIndex] = {
+                        ...subjects[subjectIndex],
+                        subject: subjectName,
+                        fullScore,
+                        currentScore,
+                        percentage: this.calculatePercentage(currentScore, fullScore)
+                    };
+                    
+                    this.updateComparisonStatus();
+                    this.saveToStorage();
+                    this.updateUI();
+                    this.closeModal();
+                    this.showMessage('修改已保存');
+                }
+            }
+            
+            closeModal() {
+                this.elements.editModal.style.display = 'none';
+                this.editingSubjectId = null;
+                this.editingTime = 'this';
+            }
+            
+            updateComparisonStatus() {
+                const canCompare = this.subjectsThis.length === this.subjectsLast.length && 
+                                  this.subjectsThis.length > 0 &&
+                                  this.subjectsThis.every((s, i) => 
+                                      this.subjectsLast[i] && s.subject === this.subjectsLast[i].subject
+                                  );
+                this.elements.showComparison.disabled = !canCompare;
+                if (!canCompare) {
+                    this.elements.showComparison.checked = false;
+                }
+            }
+            
+            getImprovementSuggestion(subjectThis, subjectLast) {
+                if (!subjectLast) {
+                    return { text: '首次记录成绩，继续努力！', type: 'info' };
+                }
+                
+                const improvement = subjectThis.percentage - subjectLast.percentage;
+                
+                if (improvement > 10) {
+                    return { text: `进步巨大！提升了${improvement.toFixed(2)}%`, type: 'good' };
+                } else if (improvement > 5) {
+                    return { text: `有明显进步，提升了${improvement.toFixed(2)}%`, type: 'good' };
+                } else if (improvement > 0) {
+                    return { text: `有进步，提升了${improvement.toFixed(2)}%`, type: 'warning' };
+                } else if (improvement === 0) {
+                    return { text: '成绩保持稳定', type: 'warning' };
+                } else if (improvement > -5) {
+                    return { text: `略有退步，下降了${Math.abs(improvement).toFixed(2)}%`, type: 'danger' };
+                } else {
+                    return { text: `退步明显，下降了${Math.abs(improvement).toFixed(2)}%`, type: 'danger' };
+                }
+            }
+            
+            updateUI() {
+                this.updateSubjectList();
+                this.updateStats();
+                this.updateChart();
+                this.updateComparisonStatus();
+            }
+            
+            updateSubjectList() {
+                const container = this.elements.subjectList;
+                
+                if (this.subjectsThis.length === 0 && this.subjectsLast.length === 0) {
+                    container.innerHTML = '<div class="no-data">暂无科目数据</div>';
+                    return;
+                }
+                
+                // 合并所有科目名称
+                const allSubjects = new Set();
+                this.subjectsThis.forEach(s => allSubjects.add(s.subject));
+                this.subjectsLast.forEach(s => allSubjects.add(s.subject));
+                
+                const subjectsArray = Array.from(allSubjects);
+                
+                const html = subjectsArray.map(subjectName => {
+                    const subjectThis = this.subjectsThis.find(s => s.subject === subjectName);
+                    const subjectLast = this.subjectsLast.find(s => s.subject === subjectName);
+                    
+                    let suggestion = null;
+                    if (subjectThis && subjectLast) {
+                        suggestion = this.getImprovementSuggestion(subjectThis, subjectLast);
+                    }
+                    
+                    return `
+                        <div class="subject-item">
+                            <div class="subject-info">
+                                <div class="subject-name">${subjectName}</div>
+                                <div class="subject-scores">
+                                    ${subjectThis ? `<span class="score-this">这次: ${subjectThis.currentScore}/${subjectThis.fullScore} (${subjectThis.percentage}%)</span>` : ''}
+                                    ${subjectLast ? `<span class="score-last">上次: ${subjectLast.currentScore}/${subjectLast.fullScore} (${subjectLast.percentage}%)</span>` : ''}
+                                </div>
+                            </div>
+                            ${suggestion ? `<div class="subject-suggestion improvement-${suggestion.type}">${suggestion.text}</div>` : ''}
+                            <div class="subject-actions">
+                                ${subjectThis ? `<button class="edit-btn" data-id="${subjectThis.id}" data-time="this">编辑这次</button>` : ''}
+                                ${subjectLast ? `<button class="edit-btn" data-id="${subjectLast.id}" data-time="last">编辑上次</button>` : ''}
+                                ${subjectThis ? `<button class="delete-btn" data-id="${subjectThis.id}" data-time="this">删除这次</button>` : ''}
+                                ${subjectLast ? `<button class="delete-btn" data-id="${subjectLast.id}" data-time="last">删除上次</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                container.innerHTML = html;
+                
+                // 重新绑定事件
+                container.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.dataset.id);
+                        const timeType = e.target.dataset.time;
+                        this.editSubject(id, timeType);
+                    });
+                });
+                
+                container.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.dataset.id);
+                        const timeType = e.target.dataset.time;
+                        this.deleteSubject(id, timeType);
+                    });
+                });
+            }
+            
+            updateStats() {
+                const stats = this.calculateStatistics();
+                
+                this.elements.totalSubjects.textContent = this.subjectsThis.length;
+                this.elements.averageScore.textContent = stats.averageScore;
+                this.elements.totalScore.textContent = stats.totalScore;
+            }
+            
+            calculateStatistics() {
+                if (this.subjectsThis.length === 0) {
+                    return { totalSubjects: 0, averageScore: 0, totalScore: 0 };
+                }
+                
+                const totalScore = this.subjectsThis.reduce((sum, subject) => sum + subject.currentScore, 0);
+                const averageScore = (totalScore / this.subjectsThis.length).toFixed(2);
+                
+                return {
+                    totalSubjects: this.subjectsThis.length,
+                    averageScore,
+                    totalScore: totalScore.toFixed(2)
+                };
+            }
+            
+            updateChart() {
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+                
+                if (this.subjectsThis.length === 0 && !this.elements.showComparison.checked) {
+                    return;
+                }
+                
+                const chartData = this.prepareChartData();
+                this.chart = this.createChart(chartData);
+            }
+            
+            prepareChartData() {
+                const labels = this.subjectsThis.map(subject => subject.subject);
+                const percentagesThis = this.subjectsThis.map(subject => subject.percentage);
+                
+                const datasets = [];
+                
+                // 这次成绩数据集
+                if (percentagesThis.length > 0) {
+                    datasets.push({
+                        label: '这次成绩',
+                        data: percentagesThis,
+                        backgroundColor: 'rgba(117, 139, 253, 0.2)',
+                        borderColor: 'rgba(117, 139, 253, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(117, 139, 253, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(117, 139, 253, 1)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    });
+                }
+                
+                // 上次成绩数据集
+                if (this.elements.showComparison.checked && this.subjectsLast.length > 0) {
+                    const percentagesLast = labels.map(label => {
+                        const subject = this.subjectsLast.find(s => s.subject === label);
+                        return subject ? subject.percentage : 0;
+                    });
+                    
+                    datasets.push({
+                        label: '上次成绩',
+                        data: percentagesLast,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(52, 152, 219, 1)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    });
+                }
+                
+                // 平均成绩数据集
+                if (this.elements.showAverageChart.checked && percentagesThis.length > 0) {
+                    const averagePercentage = percentagesThis.reduce((sum, percentage) => sum + percentage, 0) / percentagesThis.length;
+                    const averageData = Array(labels.length).fill(parseFloat(averagePercentage.toFixed(2)));
+                    
+                    const averageLineColor = this.currentTheme === 'light' ? 'rgba(100, 100, 100, 0.7)' : 'rgba(255, 255, 255, 0.7)';
+                    
+                    datasets.push({
+                        label: '平均成绩',
+                        data: averageData,
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderColor: averageLineColor,
+                        borderWidth: 1.5,
+                        borderDash: [5, 5],
+                        pointBackgroundColor: averageLineColor,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: averageLineColor,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    });
+                }
+                
+                return { labels, datasets };
+            }
+            
+            createChart(chartData) {
+                const textColor = this.currentTheme === 'light' ? '#333' : '#e6e6e6';
+                const gridColor = this.currentTheme === 'light' ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.3)';
+                
+                return new Chart(this.ctx, {
+                    type: 'radar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: {
+                            duration: 500,
+                            easing: 'easeOutQuart'
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100,
+                                min: 0,
+                                ticks: {
+                                    stepSize: 20,
+                                    backdropColor: 'transparent',
+                                    color: textColor,
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                angleLines: {
+                                    color: gridColor,
+                                    lineWidth: 1
+                                },
+                                grid: {
+                                    color: gridColor,
+                                    circular: true
+                                },
+                                pointLabels: {
+                                    color: textColor,
+                                    font: {
+                                        size: 12,
+                                        weight: '600'
+                                    },
+                                    padding: 15
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: textColor,
+                                    font: {
+                                        size: 12
+                                    },
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: this.currentTheme === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(42, 42, 60, 0.9)',
+                                titleColor: textColor,
+                                bodyColor: textColor,
+                                borderColor: 'rgba(117, 139, 253, 0.5)',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: (context) => {
+                                        return `${context.dataset.label}: ${context.parsed.r}%`;
+                                    }
+                                }
+                            }
+                        },
+                        elements: {
+                            line: {
+                                tension: 0.1
+                            }
+                        }
+                    }
+                });
+            }
+            
+            changeTheme(theme) {
+                this.currentTheme = theme;
+                this.elements.body.setAttribute('data-theme', theme);
+                
+                // 更新主题按钮状态
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.theme === theme) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                this.saveToStorage();
+                this.updateChart();
+            }
+            
+            exportData() {
+                if (this.subjectsThis.length === 0 && this.subjectsLast.length === 0) {
+                    this.showMessage('没有数据可以导出');
+                    return;
+                }
+                
+                const exportData = {
+                    subjectsThis: this.subjectsThis,
+                    subjectsLast: this.subjectsLast,
+                    theme: this.currentTheme,
+                    timestamp: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                
+                if (typeof Android !== 'undefined') {
+                    // 调用Android接口导出
+                    const result = Android.exportData(dataStr);
+                    if (result && !result.startsWith('error:')) {
+                        this.showMessage('数据已导出到下载目录');
+                    } else {
+                        this.showMessage('导出失败: ' + (result || '未知错误'));
+                    }
+                } else {
+                    // 网页版导出
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'polygon_data_' + new Date().toISOString().split('T')[0] + '.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    this.showMessage('数据已导出');
+                }
+            }
+            
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        this.processImportedData(importedData);
+                    } catch (error) {
+                        this.showMessage('文件格式错误，请选择有效的JSON文件');
+                    }
+                };
+                reader.readAsText(file);
+                
+                event.target.value = '';
+            }
+            
+            processImportedData(importedData) {
+                if (!importedData.subjectsThis && !importedData.subjectsLast) {
+                    this.showMessage('数据格式错误：缺少成绩数据');
+                    return;
+                }
+                
+                const subjectsThis = importedData.subjectsThis || [];
+                const subjectsLast = importedData.subjectsLast || [];
+                
+                // 验证数据
+                const validSubjectsThis = subjectsThis.filter(subject => 
+                    subject.subject && subject.fullScore > 0 && subject.currentScore >= 0 && subject.currentScore <= subject.fullScore
+                );
+                
+                const validSubjectsLast = subjectsLast.filter(subject => 
+                    subject.subject && subject.fullScore > 0 && subject.currentScore >= 0 && subject.currentScore <= subject.fullScore
+                );
+                
+                if (validSubjectsThis.length === 0 && validSubjectsLast.length === 0) {
+                    this.showMessage('没有找到有效的科目数据');
+                    return;
+                }
+                
+                if (confirm(`找到 ${validSubjectsThis.length} 个这次成绩和 ${validSubjectsLast.length} 个上次成绩，是否导入？`)) {
+                    this.subjectsThis = validSubjectsThis;
+                    this.subjectsLast = validSubjectsLast;
+                    
+                    if (importedData.theme) {
+                        this.changeTheme(importedData.theme);
+                    }
+                    
+                    this.saveToStorage();
+                    this.updateUI();
+                    this.showMessage('数据导入成功！');
+                }
+            }
+            
+            saveToStorage() {
+                const data = {
+                    subjectsThis: this.subjectsThis,
+                    subjectsLast: this.subjectsLast,
+                    theme: this.currentTheme,
+                    deviceType: this.deviceType,
+                    showAverage: this.elements.showAverage.checked,
+                    showComparison: this.elements.showComparison.checked
+                };
+                localStorage.setItem('polygonCalculator', JSON.stringify(data));
+            }
+            
+            loadFromStorage() {
+                try {
+                    const data = JSON.parse(localStorage.getItem('polygonCalculator'));
+                    if (data) {
+                        this.subjectsThis = data.subjectsThis || [];
+                        this.subjectsLast = data.subjectsLast || [];
+                        this.currentTheme = data.theme || 'dark';
+                        this.deviceType = 'mobile'; // 固定为手机端
+                        
+                        this.changeTheme(this.currentTheme);
+                        
+                        if (data.showAverage !== undefined) {
+                            this.elements.showAverage.checked = data.showAverage;
+                            this.elements.showAverageChart.checked = data.showAverage;
+                        }
+                        
+                        if (data.showComparison !== undefined) {
+                            this.elements.showComparison.checked = data.showComparison;
+                        }
+                    }
+                } catch (error) {
+                    console.warn('加载存储数据失败:', error);
+                }
+            }
+        }
+        
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', () => {
+            // 设置设备类型为移动端
+            window.deviceType = 'mobile';
+            new PolygonCalculator();
+        });
+        
+        // Android接口检测
+        if (typeof Android !== 'undefined') {
+            console.log('Android接口可用');
+            // 设置设备信息
+            window.deviceType = 'mobile';
+        }
+    </script>
+</body>
+</html>

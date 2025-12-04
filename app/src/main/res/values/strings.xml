@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">多边形计算机</string>
+    <string name="export_success">数据已导出</string>
+    <string name="export_failed">导出失败</string>
+    <string name="import_success">数据导入成功</string>
+    <string name="import_failed">导入失败</string>
+    <string name="storage_permission_granted">存储权限已授予</string>
+    <string name="storage_permission_denied">存储权限被拒绝，文件操作可能受限</string>
+</resources>
